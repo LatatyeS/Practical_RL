@@ -12,19 +12,24 @@ Here's an example:
 >>>agent.update(state,action, next_state,reward)
 >>>agent.epsilon *= 0.99
 """
+# qlearningAgents.py
+# ------------------
+## based on http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
 import random,math
 
 import numpy as np
 from collections import defaultdict
 
+
 class QLearningAgent():
   """
     Q-Learning Agent
 
-    The two main methods are 
-    - self.getAction(state) - returns agent's action in that state
-    - self.update(state,action,nextState,reward) - returns agent's next action
+    Instance variables you have access to
+      - self.epsilon (exploration prob)
+      - self.alpha (learning rate)
+      - self.discount (discount rate aka gamma)
 
     Functions you should use
       - self.getLegalActions(state)
@@ -71,7 +76,7 @@ class QLearningAgent():
     	return 0.0
 
     "*** YOUR CODE HERE ***"
-    return <compute state value>
+    return np.max([self.getQValue(state, action) for action in possibleActions])
     
   def getPolicy(self, state):
     """
@@ -87,7 +92,7 @@ class QLearningAgent():
     best_action = None
 
     "*** YOUR CODE HERE ***"
-    best_action = <your code>
+    best_action = possibleActions[np.argmax([self.getQValue(state, action) for action in possibleActions])]
     return best_action
 
   def getAction(self, state):
@@ -115,7 +120,7 @@ class QLearningAgent():
 
     "*** YOUR CODE HERE ***"
     
-    return <put agent's action here>
+    return random.choice(possibleActions) if (random.uniform(0, 1) < self.epsilon) else self.getPolicy(state)
 
   def update(self, state, action, nextState, reward):
     """
@@ -131,11 +136,13 @@ class QLearningAgent():
     learning_rate = self.alpha
     
     "*** YOUR CODE HERE ***"    
-    reference_qvalue = <the "correct state value", uses reward and the value of next state>
+    reference_qvalue = reward + gamma * self.getValue(nextState)
     
     updated_qvalue = (1-learning_rate) * self.getQValue(state,action) + learning_rate * reference_qvalue
     self.setQValue(state,action,updated_qvalue)
 
 
 #---------------------#end of your code#---------------------#
+
+
 
